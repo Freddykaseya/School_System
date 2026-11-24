@@ -2,14 +2,14 @@ import { redirect } from 'next/navigation'
 
 import { VueEcole } from '@/components/vue-ecole'
 import { classesEtTotaux } from '@/lib/donnees'
-import { getSession } from '@/lib/session'
+import { getSession, lireEnTantQueConnecte } from '@/lib/session'
 
 export default async function TableauDeBordEcole() {
   const { profil, ecole } = await getSession()
   if (profil.role === 'ADMIN') redirect('/admin')
   if (!ecole) redirect('/login?erreur=compte')
 
-  const { annee, classes, total } = await classesEtTotaux(ecole.id)
+  const { annee, classes, total } = await lireEnTantQueConnecte((q) => classesEtTotaux(q, ecole.id))
   return (
     <>
       <header className="heading">

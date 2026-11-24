@@ -2,6 +2,8 @@ export type Cycle = 'MATERNELLE' | 'PRIMAIRE' | 'EDUCATION_BASE' | 'HUMANITES'
 export type Role = 'ADMIN' | 'DIRECTION' | 'COMPTABLE' | 'CAISSIER'
 export type Devise = 'CDF' | 'USD'
 
+export type Annee = { id: string; libelle: string }
+
 export type Profil = {
   id: string
   email: string

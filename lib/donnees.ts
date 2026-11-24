@@ -1,101 +1,81 @@
-import 'server-only'
+import type { Requete } from './db/types.ts'
+import type { Annee, Classe, Ecole } from './types.ts'
 
-import { createClient } from '@/lib/supabase/server'
-import type { Classe, Ecole } from '@/lib/types'
+/*
+ * Lectures. Elles reçoivent une requête déjà liée à l'utilisateur connecté
+ * (voir lireEnTantQueConnecte dans lib/session.ts) : la base applique ses
+ * règles d'accès. Les totaux sont calculés par la base, sur toutes les
+ * lignes — jamais sur une liste tronquée.
+ */
 
-type Supabase = Awaited<ReturnType<typeof createClient>>
-
-/** Lit toutes les lignes d'une requête, par pages de 1 000 (limite de l'API) :
- * un total ne doit jamais être calculé sur une liste tronquée. */
-async function toutLire<T>(
-  build: (from: number, to: number) => PromiseLike<{ data: T[] | null; error: { message: string } | null }>,
-): Promise<T[]> {
-  const rows: T[] = []
-  for (let from = 0; ; from += 1000) {
-    const { data, error } = await build(from, from + 999)
-    if (error) throw new Error(error.message)
-    rows.push(...(data ?? []))
-    if (!data || data.length < 1000) return rows
-  }
-}
-
-export type Annee = { id: string; libelle: string }
-
-export async function anneeActive(supabase: Supabase): Promise<Annee | null> {
-  const { data, error } = await supabase.from('annees_scolaires').select('id, libelle').eq('active', true).maybeSingle<Annee>()
-  if (error) throw new Error(error.message)
-  return data
-}
-
+export type { Annee }
 export type Totaux = { effectif: number; du: number; paye: number; reste: number }
-const vide = (): Totaux => ({ effectif: 0, du: 0, paye: 0, reste: 0 })
-
 export type ClasseAvecTotaux = Classe & Totaux
-
-/** Classes d'une école avec effectif et situation financière de l'année active. */
-export async function classesEtTotaux(ecoleId: string): Promise<{ annee: Annee | null; classes: ClasseAvecTotaux[]; total: Totaux }> {
-  const supabase = await createClient()
-  const annee = await anneeActive(supabase)
-  const classes = await toutLire<Classe>((a, b) =>
-    supabase.from('classes').select('id, ecole_id, cycle, niveau, option_code, libelle, ordre, actif').eq('ecole_id', ecoleId).eq('actif', true).order('ordre').range(a, b),
-  )
-  const situations = annee
-    ? await toutLire<{ classe_id: string; montant_du: number; montant_paye: number; reste: number }>((a, b) =>
-        supabase.from('situation_inscriptions').select('classe_id, montant_du, montant_paye, reste').eq('ecole_id', ecoleId).eq('annee_id', annee.id).range(a, b),
-      )
-    : []
-
-  const parClasse = new Map<string, Totaux>()
-  const total = vide()
-  for (const s of situations) {
-    const t = parClasse.get(s.classe_id) ?? vide()
-    for (const cible of [t, total]) {
-      cible.effectif += 1
-      cible.du += Number(s.montant_du)
-      cible.paye += Number(s.montant_paye)
-      cible.reste += Number(s.reste)
-    }
-    parClasse.set(s.classe_id, t)
-  }
-  return { annee, classes: classes.map((c) => ({ ...c, ...(parClasse.get(c.id) ?? vide()) })), total }
-}
-
 export type EcoleAvecTotaux = Ecole & Totaux & { nbClasses: number; nbComptes: number }
 
-/** Vue d'ensemble de toutes les écoles (administrateur). */
-export async function ecolesEtTotaux(): Promise<{ annee: Annee | null; ecoles: EcoleAvecTotaux[] }> {
-  const supabase = await createClient()
-  const annee = await anneeActive(supabase)
-  const [ecoles, classes, comptes, situations] = await Promise.all([
-    toutLire<Ecole>((a, b) => supabase.from('ecoles').select('id, code, nom, cycles, devise_defaut, actif').order('code').range(a, b)),
-    toutLire<{ ecole_id: string }>((a, b) => supabase.from('classes').select('ecole_id').eq('actif', true).range(a, b)),
-    toutLire<{ ecole_id: string | null }>((a, b) => supabase.from('profils').select('ecole_id').eq('actif', true).range(a, b)),
-    annee
-      ? toutLire<{ ecole_id: string; montant_du: number; montant_paye: number; reste: number }>((a, b) =>
-          supabase.from('situation_inscriptions').select('ecole_id, montant_du, montant_paye, reste').eq('annee_id', annee.id).range(a, b),
-        )
-      : Promise.resolve([]),
-  ])
-  const compter = (rows: { ecole_id: string | null }[], id: string) => rows.filter((r) => r.ecole_id === id).length
-  return {
-    annee,
-    ecoles: ecoles.map((e) => {
-      const t = vide()
-      for (const s of situations) {
-        if (s.ecole_id !== e.id) continue
-        t.effectif += 1
-        t.du += Number(s.montant_du)
-        t.paye += Number(s.montant_paye)
-        t.reste += Number(s.reste)
-      }
-      return { ...e, ...t, nbClasses: compter(classes, e.id), nbComptes: compter(comptes, e.id) }
-    }),
-  }
+const COLONNES_ECOLE = `e.id, e.code, e.nom, e.cycles::text[] as cycles, e.devise_defaut::text as devise_defaut, e.actif`
+const SOMMES = `count(s.inscription_id)::int as effectif,
+  coalesce(sum(s.montant_du), 0)::float8 as du,
+  coalesce(sum(s.montant_paye), 0)::float8 as paye,
+  coalesce(sum(s.reste), 0)::float8 as reste`
+
+export async function anneeActive(q: Requete): Promise<Annee | null> {
+  const [annee] = await q<Annee>('select id::text, libelle from annees_scolaires where active')
+  return annee ?? null
 }
 
-export async function ecoleParCode(code: string): Promise<Ecole | null> {
-  const supabase = await createClient()
-  const { data, error } = await supabase.from('ecoles').select('id, code, nom, cycles, devise_defaut, actif').eq('code', code).maybeSingle<Ecole>()
-  if (error) throw new Error(error.message)
-  return data
+/** Classes d'une école avec effectif et situation financière de l'année active. */
+export async function classesEtTotaux(
+  q: Requete,
+  ecoleId: string,
+): Promise<{ annee: Annee | null; classes: ClasseAvecTotaux[]; total: Totaux }> {
+  const annee = await anneeActive(q)
+  const classes = await q<ClasseAvecTotaux>(
+    `select c.id::text, c.ecole_id::text, c.cycle::text as cycle, c.niveau, c.option_code, c.libelle, c.ordre, c.actif,
+            ${SOMMES}
+       from classes c
+       left join situation_inscriptions s on s.classe_id = c.id and s.annee_id = $2
+      where c.ecole_id = $1 and c.actif
+      group by c.id
+      order by c.ordre, c.libelle`,
+    [ecoleId, annee?.id ?? null],
+  )
+  // Total de l'école : toutes les inscriptions, même dans une classe fermée depuis.
+  const [total] = await q<Totaux>(
+    `select ${SOMMES} from situation_inscriptions s where s.ecole_id = $1 and s.annee_id = $2`,
+    [ecoleId, annee?.id ?? null],
+  )
+  return { annee, classes, total }
+}
+
+/** Vue d'ensemble de toutes les écoles (administrateur). */
+export async function ecolesEtTotaux(q: Requete): Promise<{ annee: Annee | null; ecoles: EcoleAvecTotaux[] }> {
+  const annee = await anneeActive(q)
+  const ecoles = await q<EcoleAvecTotaux>(
+    `select ${COLONNES_ECOLE},
+            (select count(*)::int from classes c where c.ecole_id = e.id and c.actif) as "nbClasses",
+            (select count(*)::int from profils p where p.ecole_id = e.id and p.actif) as "nbComptes",
+            coalesce(t.effectif, 0) as effectif, coalesce(t.du, 0) as du,
+            coalesce(t.paye, 0) as paye, coalesce(t.reste, 0) as reste
+       from ecoles e
+       left join (
+         select s.ecole_id, ${SOMMES}
+           from situation_inscriptions s
+          where s.annee_id = $1
+          group by s.ecole_id
+       ) t on t.ecole_id = e.id
+      order by e.code`,
+    [annee?.id ?? null],
+  )
+  return { annee, ecoles }
+}
+
+export async function ecoleParCode(q: Requete, code: string): Promise<Ecole | null> {
+  const [ecole] = await q<Ecole>(`select ${COLONNES_ECOLE} from ecoles e where e.code = $1`, [code])
+  return ecole ?? null
+}
+
+export async function ecoleParId(q: Requete, id: string): Promise<Ecole | null> {
+  const [ecole] = await q<Ecole>(`select ${COLONNES_ECOLE} from ecoles e where e.id = $1`, [id])
+  return ecole ?? null
 }

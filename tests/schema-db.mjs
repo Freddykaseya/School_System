@@ -17,7 +17,9 @@ await db.exec(`
   grant usage on schema auth to authenticated;
   grant execute on function auth.uid() to authenticated;
 `)
-await db.exec(fs.readFileSync(`${APP}/migrations/20261123_0001_schema.sql`, 'utf8'))
+for (const f of fs.readdirSync(`${APP}/migrations`).filter((f) => f.endsWith('.sql')).sort()) {
+  await db.exec(fs.readFileSync(`${APP}/migrations/${f}`, 'utf8'))
+}
 await db.exec(`grant usage on schema public to authenticated;
   grant select, insert, update, delete on all tables in schema public to authenticated;
   grant usage on all sequences in schema public to authenticated;`)

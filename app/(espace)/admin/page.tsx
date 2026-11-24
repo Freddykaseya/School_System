@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { tauxRecouvrement } from '@/lib/calculs'
 import { ecolesEtTotaux } from '@/lib/donnees'
 import { CYCLES, montant } from '@/lib/libelles'
-import { requireAdmin } from '@/lib/session'
+import { lireEnTantQueConnecte, requireAdmin } from '@/lib/session'
 
 export default async function AdminEcoles() {
   await requireAdmin()
-  const { annee, ecoles } = await ecolesEtTotaux()
+  const { annee, ecoles } = await lireEnTantQueConnecte(ecolesEtTotaux)
   const total = ecoles.reduce((a, e) => ({ effectif: a.effectif + e.effectif, du: a.du + e.du, paye: a.paye + e.paye, reste: a.reste + e.reste }), { effectif: 0, du: 0, paye: 0, reste: 0 })
   const taux = tauxRecouvrement(total.paye, total.du)
 

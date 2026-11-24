@@ -50,7 +50,8 @@ export async function updateSession(request: NextRequest) {
     return redirect
   }
 
+  // /login reste accessible même connecté : un compte désactivé y est
+  // renvoyé par les pages, le renvoyer d'ici vers « / » ferait une boucle.
   if (!connected && !isPublic) return redirectWith(new URL('/login', request.url))
-  if (connected && isPublic) return redirectWith(new URL('/', request.url))
   return response
 }

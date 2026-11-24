@@ -3,15 +3,15 @@ import { notFound } from 'next/navigation'
 
 import { VueEcole } from '@/components/vue-ecole'
 import { classesEtTotaux, ecoleParCode } from '@/lib/donnees'
-import { requireAdmin } from '@/lib/session'
+import { lireEnTantQueConnecte, requireAdmin } from '@/lib/session'
 
 export default async function AdminDetailEcole({ params }: { params: Promise<{ code: string }> }) {
   await requireAdmin()
   const { code } = await params
-  const ecole = await ecoleParCode(code.toUpperCase())
+  const ecole = await lireEnTantQueConnecte((q) => ecoleParCode(q, code.toUpperCase()))
   if (!ecole) notFound()
 
-  const { annee, classes, total } = await classesEtTotaux(ecole.id)
+  const { annee, classes, total } = await lireEnTantQueConnecte((q) => classesEtTotaux(q, ecole.id))
   return (
     <>
       <header className="heading">
