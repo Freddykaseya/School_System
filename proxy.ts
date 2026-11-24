@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { COOKIE_SESSION } from '@/lib/auth/constantes'
-import { MODE } from '@/lib/mode'
+import { AUTH_LOCALE } from '@/lib/mode'
 import { updateSession } from '@/lib/supabase/proxy'
 
 /**
@@ -12,7 +12,7 @@ import { updateSession } from '@/lib/supabase/proxy'
  * vers l'accueil créerait une boucle pour un compte désactivé.
  */
 export async function proxy(request: NextRequest) {
-  if (MODE === 'centre') return updateSession(request)
+  if (!AUTH_LOCALE) return updateSession(request)
 
   if (request.nextUrl.pathname === '/login' || request.cookies.has(COOKIE_SESSION)) return NextResponse.next()
   return NextResponse.redirect(new URL('/login', request.url))

@@ -2,6 +2,9 @@
 
 import { useActionState } from 'react'
 
+import { Logo } from '@/components/logo'
+import { MARQUE } from '@/lib/marque'
+
 import { seConnecter, type EtatConnexion } from './actions'
 
 const initial: EtatConnexion = { erreur: null }
@@ -13,10 +16,10 @@ export function LoginForm({ messageInitial }: { messageInitial: string | null })
   return (
     <form action={action} className="login-card">
       <div className="brand" style={{ padding: 0 }}>
-        <div className="brand-mark">ERP</div>
+        <Logo taille={40} />
         <div>
-          <strong>ERP Écoles</strong>
-          <span>Nova · CSGO1 · CSGO2 · CSGO3</span>
+          <strong>{MARQUE.complet}</strong>
+          <span>{MARQUE.slogan}</span>
         </div>
       </div>
       <div>

@@ -1,4 +1,6 @@
-# ERP Écoles — Nova, CSGO1, CSGO2, CSGO3
+# Blossom School — Nova, CSGO1, CSGO2, CSGO3
+
+*Gestion scolaire, même sans internet.* Nom et couleur (rose) : `lib/marque.ts` et `app/globals.css`.
 
 Gestion des élèves et des paiements pour le groupe scolaire. Chaque compte est rattaché à **une** école et n'en voit que les données ; l'administrateur voit toutes les écoles.
 
@@ -34,10 +36,21 @@ npx pnpm@12.3.4 install
 
 ```
 npx pnpm@12.3.4 poste:init CSGO2 direction@csgo2.cd "MotDePasse!2026" "Direction CSGO2" DIRECTION --frais-a-confirmer
-npx pnpm@12.3.4 dev
+npx pnpm@12.3.4 dev                 # http://localhost:3000
 ```
 
 La base locale est créée dans `donnees-locales/` (ou `ERP_DONNEES`). L'application doit être arrêtée pendant `poste:init` : une seule ouverture de la base à la fois (verrou `donnees-locales.verrou`).
+
+### Essayer l'administration (centre de démonstration)
+
+Tant que la base Supabase n'existe pas, le centre tourne sur une base locale (`donnees-centre-demo/`) :
+
+```
+npx pnpm@12.3.4 centre:init admin@groupe.cd "MotDePasse!2026" "Administrateur" --frais-a-confirmer
+npx pnpm@12.3.4 dev:centre          # http://localhost:3001 (ou : node scripts/lancer.mjs centre 3002)
+```
+
+**Comptes et accès** : l'administrateur ajoute une personne (nom, e-mail, rôle, école) ; un mot de passe provisoire est créé et affiché une seule fois. Il peut ensuite changer le rôle ou l'école, désactiver le compte ou créer un nouveau mot de passe. Chaque changement est écrit dans le journal. Un compte d'école n'accède qu'à son école ; seul l'administrateur voit toutes les écoles.
 
 ### Base centrale (Supabase)
 
@@ -51,7 +64,7 @@ La base locale est créée dans `donnees-locales/` (ou `ERP_DONNEES`). L'applica
    npx pnpm@12.3.4 create-user admin@exemple.cd "MotDePasseSolide" "Administrateur" ADMIN
    npx pnpm@12.3.4 create-user caisse.csgo2@exemple.cd "MotDePasseSolide" "Caisse CSGO2" CAISSIER CSGO2
    ```
-4. Serveur de l'administrateur : `ERP_MODE=centre` et `DATABASE_URL` dans `.env.local`.
+4. Serveur de l'administrateur : `ERP_MODE=centre`, `DATABASE_URL` et `SUPABASE_SERVICE_ROLE_KEY` dans `.env.local` (l'écran « Comptes et accès » crée alors les comptes dans Supabase Auth).
 
 ### Tests
 
@@ -82,6 +95,7 @@ npx pnpm@12.3.4 typecheck
 - `app/(espace)/admin` : toutes les écoles, puis `admin/ecoles/[code]` pour le détail.
 - `lib/donnees.ts` : lectures en SQL, toujours avec l'identité de l'utilisateur (`lib/db/en-tant-que.ts`), donc soumises aux règles d'accès.
 - `lib/db/` : base du PC (PGlite, migrations, verrou) et base centrale (PostgreSQL).
+- `lib/comptes/` : gestion des comptes par l'administrateur (règles, identités Supabase ou locales).
 - `lib/poste/` : propre au PC de l'école — identifiants hors ligne, réception de la configuration du centre.
 - `db/local/` : SQL propre au PC (équivalent local de Supabase Auth, opérations à envoyer).
 - `lib/libelles.ts` : tous les textes et formats affichés (prêt pour une seconde langue).

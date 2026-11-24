@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-centre/
 out/
 *.tsbuildinfo
 next-env.d.ts
@@ -9,4 +10,5 @@ next-env.d.ts
 
 # Base locale PGlite du PC de l'ecole (donnees reelles, jamais dans Git)
 donnees-locales/
+donnees-centre-demo/
 *.verrou

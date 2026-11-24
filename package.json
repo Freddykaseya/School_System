@@ -7,14 +7,16 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/lancer.mjs ecole",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "test:db": "node tests/schema-db.mjs",
     "create-user": "node --env-file=.env.local scripts/create-user.mjs",
-    "poste:init": "node --env-file-if-exists=.env.local scripts/init-poste.mts"
+    "poste:init": "node --env-file-if-exists=.env.local scripts/init-poste.mts",
+    "dev:centre": "node scripts/lancer.mjs centre",
+    "centre:init": "node --env-file-if-exists=.env.local scripts/init-centre-demo.mts"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.3.14",

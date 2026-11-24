@@ -8,7 +8,8 @@ import type { Connexion } from './types.ts'
 
 /** Dossier des données du PC (fichiers de la base PGlite). */
 export function dossierDonnees(): string {
-  return process.env.ERP_DONNEES ?? path.join(process.cwd(), 'donnees-locales')
+  const defaut = process.env.ERP_MODE === 'centre' ? 'donnees-centre-demo' : 'donnees-locales'
+  return process.env.ERP_DONNEES ?? path.join(process.cwd(), defaut)
 }
 
 function processusVivant(pid: number): boolean {

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 
+import { MARQUE } from '@/lib/marque'
+
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ERP Écoles',
-  description: 'Gestion des élèves et des paiements — Nova, CSGO1, CSGO2, CSGO3',
+  title: MARQUE.complet,
+  description: `${MARQUE.slogan} — ${MARQUE.ecoles}`,
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

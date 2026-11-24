@@ -10,7 +10,7 @@ import { enTantQue } from '@/lib/db/en-tant-que'
 import { baseLocale, connexion } from '@/lib/db/serveur'
 import type { Requete } from '@/lib/db/types'
 import { ecoleParId } from '@/lib/donnees'
-import { MODE } from '@/lib/mode'
+import { AUTH_LOCALE } from '@/lib/mode'
 import { secretSession } from '@/lib/poste/comptes'
 import { createClient } from '@/lib/supabase/server'
 import type { Ecole, Profil } from '@/lib/types'
@@ -19,7 +19,7 @@ export type Session = { profil: Profil; ecole: Ecole | null }
 
 /** Identifiant de l'utilisateur connecté, ou null. */
 async function utilisateurConnecte(): Promise<string | null> {
-  if (MODE === 'ecole') {
+  if (AUTH_LOCALE) {
     const jeton = (await cookies()).get(COOKIE_SESSION)?.value
     return verifierJeton(jeton, await secretSession(await baseLocale()))
   }

@@ -30,3 +30,11 @@ export function montant(valeur: number, devise: Devise = 'CDF'): string {
   const texte = FORMATS[devise].format(valeur).replace(/ | /g, ' ')
   return devise === 'CDF' ? `${texte} FC` : `${texte} $`
 }
+
+/** Ce que chaque rôle peut faire (rappel affiché à l'administrateur). */
+export const ROLES_DROITS: Record<Role, string> = {
+  DIRECTION: 'voit son école ; inscrit, accorde les prises en charge, encaisse et annule un paiement',
+  COMPTABLE: 'voit son école ; inscrit, encaisse et annule un paiement',
+  CAISSIER: 'voit son école ; encaisse uniquement',
+  ADMIN: 'voit toutes les écoles ; configure les écoles, les classes, les frais et les comptes',
+}
