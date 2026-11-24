@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { OngletsEcole } from '@/components/admin/onglets-ecole'
 import { VueEcole } from '@/components/vue-ecole'
 import { classesEtTotaux, ecoleParCode } from '@/lib/donnees'
 import { lireEnTantQueConnecte, requireAdmin } from '@/lib/session'
@@ -16,11 +17,12 @@ export default async function AdminDetailEcole({ params }: { params: Promise<{ c
     <>
       <header className="heading">
         <div>
-          <p className="eyebrow"><Link href="/admin">Toutes les écoles</Link> · {ecole.code}</p>
+          <p className="eyebrow"><Link href="/choisir">Choisir une école</Link> · {ecole.code}</p>
           <h1>{ecole.nom}</h1>
           <p className="sub">Vue identique à celle de l’école, en lecture.</p>
         </div>
       </header>
+      <OngletsEcole code={ecole.code} actif="tableau" />
       <VueEcole ecole={ecole} annee={annee} classes={classes} total={total} />
     </>
   )

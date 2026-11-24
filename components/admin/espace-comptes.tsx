@@ -2,6 +2,7 @@ import { ArrowLeft, School, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
 import { FormNouveauCompte, type EcoleChoix } from '@/components/admin/formulaires-compte'
+import { OngletsEcole } from '@/components/admin/onglets-ecole'
 import type { Compte } from '@/lib/comptes/service'
 import { ROLES } from '@/lib/libelles'
 
@@ -14,8 +15,8 @@ export function EspaceComptes({ ecole, comptes }: { ecole: EcoleChoix | null; co
 
   return (
     <>
-      <Link href="/admin/comptes" className="retour">
-        <ArrowLeft size={16} aria-hidden="true" /> Toutes les écoles
+      <Link href={ecole ? '/choisir' : '/admin/comptes'} className="retour">
+        <ArrowLeft size={16} aria-hidden="true" /> {ecole ? 'Choisir une école' : 'Comptes et accès'}
       </Link>
       <header className="heading">
         <div className="entete-espace">
@@ -31,6 +32,7 @@ export function EspaceComptes({ ecole, comptes }: { ecole: EcoleChoix | null; co
           </div>
         </div>
       </header>
+      {ecole ? <OngletsEcole code={ecole.code} actif="personnel" /> : null}
 
       <section className="card">
         <div className="card-head">

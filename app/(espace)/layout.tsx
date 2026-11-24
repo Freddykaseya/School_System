@@ -12,6 +12,7 @@ export default async function EspaceLayout({ children }: { children: React.React
 
   const liens: LienNav[] = admin
     ? [
+        { href: '/choisir', libelle: 'Choisir une école' },
         { href: '/admin', libelle: 'Toutes les écoles', prefixes: ['/admin/ecoles'] },
         { href: '/admin/comptes', libelle: 'Comptes et accès' },
       ]
