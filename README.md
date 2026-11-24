@@ -95,6 +95,9 @@ npx pnpm@12.3.4 typecheck
 - `app/(espace)/admin` : toutes les écoles, puis `admin/ecoles/[code]` pour le détail.
 - `lib/donnees.ts` : lectures en SQL, toujours avec l'identité de l'utilisateur (`lib/db/en-tant-que.ts`), donc soumises aux règles d'accès.
 - `lib/db/` : base du PC (PGlite, migrations, verrou) et base centrale (PostgreSQL).
+- `lib/comptabilite/` : lecture des PDF « Tableau de bord » et de l'Excel « Restant dû », rapprochement, incohérences, rapport (espace Comptabilité de chaque école).
+- `lib/acces.ts` : qui peut entrer dans quelle école et dans quel espace (sinon « Votre accès ne vous permet pas d'accéder à ce domaine »).
+- `docs/vision-produit.md` : vision du produit et cahier de design.
 - `lib/comptes/` : gestion des comptes par l'administrateur (règles, identités Supabase ou locales).
 - `lib/poste/` : propre au PC de l'école — identifiants hors ligne, réception de la configuration du centre.
 - `db/local/` : SQL propre au PC (équivalent local de Supabase Auth, opérations à envoyer).

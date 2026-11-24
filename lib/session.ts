@@ -51,10 +51,10 @@ export const getSession = cache(async (): Promise<Session> => {
   return session
 })
 
-/** Réservé à l'administrateur du groupe scolaire. */
+/** Réservé à l'administrateur du groupe scolaire ; sinon, accès refusé. */
 export async function requireAdmin(): Promise<Session> {
   const session = await getSession()
-  if (session.profil.role !== 'ADMIN') redirect('/')
+  if (session.profil.role !== 'ADMIN') redirect('/acces-refuse?domaine=admin')
   return session
 }
 

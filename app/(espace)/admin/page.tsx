@@ -53,7 +53,7 @@ export default async function AdminEcoles() {
                 const t = tauxRecouvrement(e.paye, e.du)
                 return (
                   <tr key={e.id}>
-                    <td><Link href={`/admin/ecoles/${e.code}`}>{e.code}</Link><div className="sub" style={{ marginTop: 2 }}>{e.nom}</div></td>
+                    <td><Link href={`/ecoles/${e.code}`}>{e.code}</Link><div className="sub" style={{ marginTop: 2 }}>{e.nom}</div></td>
                     <td>{e.cycles.map((c) => CYCLES[c]).join(', ')}</td>
                     <td className="num">{e.nbClasses === 0 ? <span className="badge warn">à configurer</span> : e.nbClasses}</td>
                     <td className="num">{e.nbComptes}</td>

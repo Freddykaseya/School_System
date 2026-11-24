@@ -1,11 +1,20 @@
 import Link from 'next/link'
 
-/** Onglets de l'espace d'une école, côté administrateur. */
-export function OngletsEcole({ code, actif }: { code: string; actif: 'tableau' | 'personnel' }) {
+export type OngletEcole = 'accueil' | 'tableau' | 'comptabilite' | 'personnel'
+
+/** Navigation à l'intérieur d'une école. « Personnel » : administrateur seulement. */
+export function OngletsEcole({ code, actif, admin = false }: { code: string; actif: OngletEcole; admin?: boolean }) {
+  const onglets: { cle: OngletEcole; libelle: string; href: string }[] = [
+    { cle: 'accueil', libelle: 'Accueil', href: `/ecoles/${code}` },
+    { cle: 'tableau', libelle: 'Tableau de bord', href: `/ecoles/${code}/tableau-de-bord` },
+    { cle: 'comptabilite', libelle: 'Comptabilité', href: `/ecoles/${code}/comptabilite` },
+    ...(admin ? [{ cle: 'personnel' as const, libelle: 'Personnel', href: `/admin/comptes/ecole/${code}` }] : []),
+  ]
   return (
-    <nav className="tabs" aria-label={`Espace ${code}`}>
-      <Link href={`/admin/ecoles/${code}`} className={actif === 'tableau' ? 'active' : undefined}>Tableau de bord</Link>
-      <Link href={`/admin/comptes/ecole/${code}`} className={actif === 'personnel' ? 'active' : undefined}>Personnel</Link>
+    <nav className="tabs ecran-seulement" aria-label={`Espace ${code}`}>
+      {onglets.map((o) => (
+        <Link key={o.cle} href={o.href} className={actif === o.cle ? 'active' : undefined}>{o.libelle}</Link>
+      ))}
     </nav>
   )
 }

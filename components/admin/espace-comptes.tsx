@@ -32,7 +32,7 @@ export function EspaceComptes({ ecole, comptes }: { ecole: EcoleChoix | null; co
           </div>
         </div>
       </header>
-      {ecole ? <OngletsEcole code={ecole.code} actif="personnel" /> : null}
+      {ecole ? <OngletsEcole code={ecole.code} actif="personnel" admin /> : null}
 
       <section className="card">
         <div className="card-head">

@@ -181,6 +181,69 @@ td a { text-decoration: none; font-weight: 700; color: var(--brand); }
 .choix-tuile.admin { background: var(--brand); color: #fff; }
 .choix-tuile.admin:hover, .choix-tuile.admin:focus-visible { background: var(--brand-strong); }
 
+/* --- Comptabilité --- */
+.depot { margin: 0 18px; padding: 26px 18px; border: 2px dashed var(--brand-line); border-radius: 14px; background: #fffafc; display: grid; justify-items: center; gap: 6px; text-align: center; color: var(--brand); cursor: pointer; transition: background .15s ease, border-color .15s ease; }
+.depot strong { color: var(--ink); }
+.depot span { color: var(--muted); font-size: 13px; }
+.depot:hover, .depot.survol, .depot:focus-visible { background: var(--brand-soft); border-color: var(--brand); outline: none; }
+.fichiers { margin: 14px 18px 0; }
+.fichiers-tete { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.fichiers ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; max-height: 150px; overflow: auto; }
+.fichiers li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 9px; border-radius: 999px; background: var(--soft); font-size: 12px; font-weight: 600; }
+.fichiers li button { border: 0; background: none; padding: 2px; cursor: pointer; color: var(--faint); display: grid; }
+.fichiers li button:hover { color: var(--bad); }
+.barre-actions { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin: 8px 0 14px; }
+.barre-actions h2 { font-size: 17px; }
+.barre-actions > div { display: flex; gap: 8px; flex-wrap: wrap; }
+.barre-actions button { display: inline-flex; align-items: center; gap: 7px; }
+.barres { display: grid; grid-template-columns: repeat(10, 1fr); gap: 2px; padding: 22px 18px 14px; height: 250px; }
+.barre-colonne { display: grid; grid-template-rows: 1fr auto; min-width: 0; }
+.barre-zone { position: relative; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; border-bottom: 1px solid var(--line); }
+.barre { position: relative; width: 62%; min-height: 2px; background: var(--brand); border-radius: 4px 4px 0 0; outline: none; }
+.barre:hover, .barre:focus-visible { background: var(--brand-strong); }
+.barre-valeur { font-size: 11px; font-weight: 700; color: var(--muted); margin-bottom: 4px; white-space: nowrap; }
+.barre .infobulle { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 5px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .1s ease; z-index: 2; }
+.barre:hover .infobulle, .barre:focus-visible .infobulle { opacity: 1; }
+.barre-mois { text-align: center; font-size: 11px; color: var(--faint); font-weight: 700; padding-top: 6px; }
+tr.ligne-total td { font-weight: 800; background: var(--soft); }
+.anomalies details { border-top: 1px solid var(--line); }
+.anomalies summary { display: flex; gap: 10px; align-items: center; padding: 11px 18px; cursor: pointer; list-style: none; }
+.anomalies summary::-webkit-details-marker { display: none; }
+.anomalies summary:hover { background: #fff8fb; }
+.anomalie-titre { flex: 1; font-weight: 600; }
+.anomalies ul { margin: 0; padding: 4px 18px 14px 42px; display: grid; gap: 4px; color: var(--muted); font-size: 13px; line-height: 1.45; max-height: 320px; overflow: auto; }
+.filtres { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.filtres .tabs button { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: #fff; color: var(--muted); font-weight: 700; font-size: 13px; cursor: pointer; }
+.filtres .tabs button.active { background: var(--brand); border-color: var(--brand); color: #fff; }
+.filtres select, .filtres input { height: 36px; border: 1px solid var(--line); border-radius: 8px; padding: 0 10px; background: #fff; }
+.filtres input { min-width: 220px; }
+.rapport-impression { display: none; }
+
+/* --- Impression du rapport --- */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body { background: #fff; font-size: 11px; }
+  .sidebar, .ecran-seulement, .heading, .retour, .tabs { display: none !important; }
+  .shell { display: block; }
+  .main { padding: 0; max-width: none; }
+  .rapport-impression { display: block; color: #000; }
+  .rapport-impression header { border-bottom: 3px solid var(--brand); padding-bottom: 8px; margin-bottom: 14px; }
+  .rapport-impression h1 { font-size: 18px; }
+  .rapport-impression header p { margin: 4px 0 0; color: #444; }
+  .rapport-impression h2 { font-size: 14px; margin: 18px 0 8px; color: var(--brand-strong); break-after: avoid; }
+  .rapport-impression h3 { font-size: 12px; margin: 10px 0 4px; break-after: avoid; }
+  .rapport-impression table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+  .rapport-impression th, .rapport-impression td { border: 1px solid #ccc; padding: 3px 6px; background: none; color: #000; font-size: 10.5px; text-transform: none; letter-spacing: 0; white-space: normal; }
+  .rapport-impression tr { break-inside: avoid; }
+  .rapport-impression ul { margin: 0 0 6px; padding-left: 18px; }
+  .rapport-impression li { margin-bottom: 2px; }
+}
+
+/* --- Accès refusé, accueil d'une école --- */
+.refus { max-width: 520px; margin: 12vh auto 0; text-align: center; display: grid; gap: 14px; justify-items: center; }
+.refus .tuile-icone { width: 64px; height: 64px; background: linear-gradient(140deg, #f08c8c, var(--bad)); box-shadow: none; }
+.refus h1 { font-size: 26px; }
+
 @media (max-width: 900px) {
   .shell { flex-direction: column; }
   .sidebar { width: 100%; flex-basis: auto; height: auto; position: static; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px; padding: 12px 16px; }
