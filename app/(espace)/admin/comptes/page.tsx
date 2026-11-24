@@ -1,24 +1,44 @@
+import { Plus, School, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
-import { AideRoles, FormNouveauCompte, type EcoleChoix } from '@/components/admin/formulaires-compte'
-import { listerComptes } from '@/lib/comptes/service'
+import type { EcoleChoix } from '@/components/admin/formulaires-compte'
+import { listerComptes, type Compte } from '@/lib/comptes/service'
 import { ROLES } from '@/lib/libelles'
 import { lireEnTantQueConnecte, requireAdmin } from '@/lib/session'
+import type { Role } from '@/lib/types'
 
-export default async function Comptes({ searchParams }: { searchParams: Promise<{ ecole?: string }> }) {
+function Puces({ comptes, roles }: { comptes: Compte[]; roles: Role[] }) {
+  const actifs = comptes.filter((c) => c.actif)
+  return (
+    <div className="tuile-roles">
+      {roles.map((r) => (
+        <span key={r} className="puce">
+          {ROLES[r]} <b>{actifs.filter((c) => c.role === r).length}</b>
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function Pied({ comptes }: { comptes: Compte[] }) {
+  const actifs = comptes.filter((c) => c.actif).length
+  return (
+    <div className="tuile-pied">
+      <small>
+        {actifs} personne{actifs > 1 ? 's' : ''} active{actifs > 1 ? 's' : ''}
+      </small>
+      <span className="tuile-ajouter"><Plus size={16} aria-hidden="true" /> Ajouter</span>
+    </div>
+  )
+}
+
+export default async function Comptes() {
   await requireAdmin()
-  const { ecole: filtre } = await searchParams
   const { comptes, ecoles } = await lireEnTantQueConnecte(async (q) => ({
     comptes: await listerComptes(q),
     ecoles: await q<EcoleChoix>('select id::text, code, nom from ecoles where actif order by code'),
   }))
-
-  const onglets = [
-    { cle: undefined, libelle: 'Tous', nombre: comptes.length },
-    ...ecoles.map((e) => ({ cle: e.code, libelle: e.code, nombre: comptes.filter((c) => c.ecole_code === e.code).length })),
-    { cle: 'ADMIN', libelle: 'Administrateurs', nombre: comptes.filter((c) => c.role === 'ADMIN').length },
-  ]
-  const visibles = comptes.filter((c) => !filtre || (filtre === 'ADMIN' ? c.role === 'ADMIN' : c.ecole_code === filtre))
+  const admins = comptes.filter((c) => c.role === 'ADMIN')
 
   return (
     <>
@@ -26,62 +46,35 @@ export default async function Comptes({ searchParams }: { searchParams: Promise<
         <div>
           <p className="eyebrow">Administration</p>
           <h1>Comptes et accès</h1>
-          <p className="sub">Chaque personne a un rôle et accède à une seule école ; l’administrateur voit toutes les écoles.</p>
+          <p className="sub">Choisissez une école pour voir son personnel et ajouter une personne.</p>
         </div>
       </header>
 
-      <section className="card">
-        <div className="card-head">
-          <h2>Ajouter une personne</h2>
-          <p>Elle pourra se connecter sur le PC de son école</p>
-        </div>
-        <FormNouveauCompte ecoles={ecoles} />
-        <AideRoles />
-      </section>
+      <section className="tuiles" aria-label="Écoles">
+        {ecoles.map((e) => {
+          const liste = comptes.filter((c) => c.ecole_id === e.id)
+          return (
+            <Link key={e.id} href={`/admin/comptes/ecole/${e.code}`} className="tuile">
+              <div className="tuile-icone"><School size={26} aria-hidden="true" /></div>
+              <div className="tuile-titre">
+                <strong>{e.code}</strong>
+                <span>{e.nom}</span>
+              </div>
+              <Puces comptes={liste} roles={['DIRECTION', 'COMPTABLE', 'CAISSIER']} />
+              <Pied comptes={liste} />
+            </Link>
+          )
+        })}
 
-      <nav className="tabs" aria-label="Filtrer par école">
-        {onglets.map((o) => (
-          <Link key={o.libelle} href={o.cle ? `/admin/comptes?ecole=${o.cle}` : '/admin/comptes'} className={filtre === o.cle ? 'active' : undefined}>
-            {o.libelle} · {o.nombre}
-          </Link>
-        ))}
-      </nav>
-
-      <section className="card">
-        <div className="card-head">
-          <h2>Personnes</h2>
-          <p>{visibles.filter((c) => c.actif).length} actives · {visibles.filter((c) => !c.actif).length} désactivées</p>
-        </div>
-        {visibles.length === 0 ? (
-          <div className="empty">Aucun compte ici pour l’instant.</div>
-        ) : (
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nom</th>
-                  <th>Adresse e-mail</th>
-                  <th>Rôle</th>
-                  <th>École</th>
-                  <th>État</th>
-                  <th>Créé le</th>
-                </tr>
-              </thead>
-              <tbody>
-                {visibles.map((c) => (
-                  <tr key={c.id}>
-                    <td><Link href={`/admin/comptes/${c.id}`}>{c.nom_complet}</Link></td>
-                    <td>{c.email}</td>
-                    <td><span className={`badge ${c.role === 'ADMIN' ? 'brand' : 'neutral'}`}>{ROLES[c.role]}</span></td>
-                    <td>{c.ecole_code ?? 'Toutes'}</td>
-                    <td>{c.actif ? <span className="badge ok">Actif</span> : <span className="badge bad">Désactivé</span>}</td>
-                    <td>{c.cree_le}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <Link href="/admin/comptes/administrateurs" className="tuile admin">
+          <div className="tuile-icone"><ShieldCheck size={26} aria-hidden="true" /></div>
+          <div className="tuile-titre">
+            <strong>Administrateur</strong>
+            <span>Accès à toutes les écoles et à la gestion des comptes</span>
           </div>
-        )}
+          <Puces comptes={admins} roles={['ADMIN']} />
+          <Pied comptes={admins} />
+        </Link>
       </section>
     </>
   )

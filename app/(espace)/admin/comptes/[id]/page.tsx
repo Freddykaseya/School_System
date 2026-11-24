@@ -22,7 +22,15 @@ export default async function FicheCompte({ params }: { params: Promise<{ id: st
     <>
       <header className="heading">
         <div>
-          <p className="eyebrow"><Link href="/admin/comptes">Comptes et accès</Link> · {ROLES[compte.role]}</p>
+          <p className="eyebrow">
+            <Link href="/admin/comptes">Comptes et accès</Link> ·{' '}
+            {compte.ecole_code ? (
+              <Link href={`/admin/comptes/ecole/${compte.ecole_code}`}>{compte.ecole_code}</Link>
+            ) : (
+              <Link href="/admin/comptes/administrateurs">Administrateurs</Link>
+            )}{' '}
+            · {ROLES[compte.role]}
+          </p>
           <h1>{compte.nom_complet}</h1>
           <p className="sub">{compte.email} · créé le {compte.cree_le}</p>
         </div>

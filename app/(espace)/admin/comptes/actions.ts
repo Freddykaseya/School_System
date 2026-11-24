@@ -28,7 +28,7 @@ export async function creerCompteAction(precedent: EtatFormulaire, fd: FormData)
       role: texte(fd, 'role') as Role,
       ecoleId: texte(fd, 'ecole_id') || null,
     })
-    revalidatePath('/admin/comptes')
+    revalidatePath('/admin/comptes', 'layout')
     return { erreur: null, succes: `Compte créé pour ${email.toLowerCase()}.`, motDePasse, fois: precedent.fois + 1 }
   } catch (e) {
     return echec(e, precedent)
@@ -45,7 +45,7 @@ export async function modifierCompteAction(precedent: EtatFormulaire, fd: FormDa
       ecoleId: texte(fd, 'ecole_id') || null,
       actif: fd.get('actif') === 'on',
     })
-    revalidatePath('/admin/comptes')
+    revalidatePath('/admin/comptes', 'layout')
     revalidatePath(`/admin/comptes/${id}`)
     return { erreur: null, succes: 'Modifications enregistrées.', motDePasse: null, fois: precedent.fois + 1 }
   } catch (e) {

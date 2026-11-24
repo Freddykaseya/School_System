@@ -1,5 +1,6 @@
 'use client'
 
+import { Calculator, Crown, ShieldCheck, UserPlus, Wallet } from 'lucide-react'
 import { useActionState, useEffect, useState } from 'react'
 
 import {
@@ -75,12 +76,15 @@ export function AideRoles() {
   )
 }
 
-export function FormNouveauCompte({ ecoles }: { ecoles: EcoleChoix[] }) {
+const ICONES_ROLES = { DIRECTION: Crown, COMPTABLE: Calculator, CAISSIER: Wallet, ADMIN: ShieldCheck } as const
+const ROLES_ECOLE: Role[] = ['DIRECTION', 'COMPTABLE', 'CAISSIER']
+
+/** Ajout d'une personne dans une école (choix du rôle) ou d'un administrateur. */
+export function FormNouveauCompte({ ecole }: { ecole: EcoleChoix | null }) {
   const [etat, action, enCours] = useActionState(creerCompteAction, INITIAL)
   const [email, setEmail] = useState('')
   const [nom, setNom] = useState('')
-  const [role, setRole] = useState<Role>('CAISSIER')
-  const [ecoleId, setEcoleId] = useState('')
+  const [role, setRole] = useState<Role>(ecole ? 'CAISSIER' : 'ADMIN')
 
   // Compte créé : on vide le formulaire pour la personne suivante.
   useEffect(() => {
@@ -92,20 +96,45 @@ export function FormNouveauCompte({ ecoles }: { ecoles: EcoleChoix[] }) {
 
   return (
     <form action={action}>
+      {ecole ? <input type="hidden" name="ecole_id" value={ecole.id} /> : null}
       <div className="form-grid">
         <label className="field">
           Nom complet
-          <input name="nom_complet" value={nom} onChange={(e) => setNom(e.target.value)} placeholder="ex. Marie Kabila" required />
+          <input name="nom_complet" value={nom} onChange={(e) => setNom(e.target.value)} placeholder="ex. Marie Kabila" required autoFocus />
         </label>
         <label className="field">
           Adresse e-mail
-          <input name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="ex. caisse@csgo2.cd" required />
+          <input name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder={ecole ? `ex. caisse@${ecole.code.toLowerCase()}.cd` : 'ex. admin@groupe.cd'} required />
         </label>
-        <ChampsRoleEcole role={role} setRole={setRole} ecoleId={ecoleId} setEcoleId={setEcoleId} ecoles={ecoles} />
       </div>
-      <div className="form-actions">
+      {ecole ? (
+        <>
+          <div className="section-titre">Rôle dans l’école</div>
+          <div className="roles-choix" role="radiogroup" aria-label="Rôle">
+            {ROLES_ECOLE.map((r) => {
+              const Icone = ICONES_ROLES[r]
+              return (
+                <label key={r} className="role-carte">
+                  <input type="radio" name="role" value={r} checked={role === r} onChange={() => setRole(r)} />
+                  <strong><Icone size={16} aria-hidden="true" /> {ROLES[r]}</strong>
+                  <span>{ROLES_DROITS[r].replace(/^voit son école ; /, '')}</span>
+                </label>
+              )
+            })}
+          </div>
+        </>
+      ) : (
+        <>
+          <input type="hidden" name="role" value="ADMIN" />
+          <p className="sub" style={{ margin: '0 18px' }}>Un administrateur {ROLES_DROITS.ADMIN}.</p>
+        </>
+      )}
+      <div className="form-actions" style={{ paddingTop: 16 }}>
         <button className="primary compact" type="submit" disabled={enCours}>
-          {enCours ? 'Création…' : 'Ajouter la personne'}
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <UserPlus size={16} aria-hidden="true" />
+            {enCours ? 'Création…' : ecole ? `Ajouter à ${ecole.code}` : 'Ajouter l’administrateur'}
+          </span>
         </button>
         <span className="sub" style={{ margin: 0 }}>Un mot de passe provisoire est créé automatiquement.</span>
       </div>
