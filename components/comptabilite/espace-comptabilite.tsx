@@ -18,6 +18,10 @@ const STATUTS: Record<StatutEleve, { libelle: string; ton: string }> = {
 }
 const GRAVITES = { haute: { libelle: 'À corriger', ton: 'bad' }, moyenne: { libelle: 'À vérifier', ton: 'warn' }, basse: { libelle: 'Info', ton: 'neutral' } }
 
+const MOIS_COURTS: Partial<Record<Colonne, string>> = {
+  SPBR: 'Sept.', OCTB: 'Oct.', NVBR: 'Nov.', DCBR: 'Déc.', JANV: 'Janv.', FVR: 'Févr.', MARS: 'Mars', AVR: 'Avr.', MAI: 'Mai', JUIN: 'Juin',
+}
+
 const pct = (t: number | null) => (t === null ? '—' : `${t.toLocaleString('fr-FR')} %`)
 const tonTaux = (t: number | null) => (t === null ? 'neutral' : t >= 80 ? 'ok' : t >= 50 ? 'warn' : 'bad')
 
@@ -209,7 +213,7 @@ function GraphiqueEncaissements({ total }: { total: Agregat }) {
                   <span className="infobulle">{LIBELLES_COLONNES[m]} : {montant(v)}</span>
                 </div>
               </div>
-              <span className="barre-mois">{LIBELLES_COLONNES[m].slice(0, 4)}.</span>
+              <span className="barre-mois">{MOIS_COURTS[m]}</span>
             </div>
           )
         })}

@@ -1,3 +1,4 @@
+import { School, ShieldCheck } from 'lucide-react'
 import Link from 'next/link'
 
 import { seDeconnecter } from '@/app/login/actions'
@@ -31,12 +32,16 @@ export default async function ChoisirEcole() {
         <h1 className="choix-titre">Choisissez votre école</h1>
         <nav className="choix-tuiles" aria-label="Écoles">
           {ecoles.map((e) => (
-            <Link key={e.code} href={`/ecoles/${e.code}`} className="choix-tuile" title={e.nom}>
-              {e.code}
+            <Link key={e.code} href={`/ecoles/${e.code}`} className="choix-tuile">
+              <School size={30} aria-hidden="true" />
+              <strong>{e.code}</strong>
+              <span>{e.nom}</span>
             </Link>
           ))}
-          <Link href="/admin" className="choix-tuile admin" title="Administration du groupe : toutes les écoles et les comptes">
-            Admin
+          <Link href="/admin" className="choix-tuile admin">
+            <ShieldCheck size={30} aria-hidden="true" />
+            <strong>Admin</strong>
+            <span>Toutes les écoles et les comptes</span>
           </Link>
         </nav>
       </section>

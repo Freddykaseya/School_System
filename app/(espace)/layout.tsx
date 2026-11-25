@@ -12,13 +12,13 @@ export default async function EspaceLayout({ children }: { children: React.React
 
   const liens: LienNav[] = admin
     ? [
-        { href: '/choisir', libelle: 'Choisir une école', prefixes: ['/ecoles'] },
-        { href: '/admin', libelle: 'Toutes les écoles', prefixes: [] },
-        { href: '/admin/comptes', libelle: 'Comptes et accès' },
+        { href: '/choisir', libelle: 'Choisir une école', icone: 'choisir', prefixes: ['/ecoles'] },
+        { href: '/admin', libelle: 'Toutes les écoles', icone: 'ecoles', prefixes: [] },
+        { href: '/admin/comptes', libelle: 'Comptes et accès', icone: 'comptes' },
       ]
     : [
-        { href: '/choisir', libelle: 'Choisir une école' },
-        ...(ecole ? [{ href: `/ecoles/${ecole.code}`, libelle: `Mon école · ${ecole.code}` }] : []),
+        { href: '/choisir', libelle: 'Choisir une école', icone: 'choisir', prefixes: [] },
+        ...(ecole ? [{ href: `/ecoles/${ecole.code}`, libelle: `Mon école · ${ecole.code}`, icone: 'ecole' as const }] : []),
       ]
 
   return (

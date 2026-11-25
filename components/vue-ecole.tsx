@@ -39,6 +39,14 @@ export function VueEcole({ ecole, annee, classes, total }: { ecole: Ecole; annee
             </div>
             {liste.length === 0 ? (
               <div className="empty">Aucune classe configurée pour ce cycle.</div>
+            ) : liste.every((c) => c.effectif === 0) ? (
+              // Pas encore d'élève : la liste des classes suffit, sans lignes de zéros.
+              <div className="empty">
+                Aucun élève inscrit pour l’instant dans ces classes :
+                <div className="tuile-roles" style={{ marginTop: 10 }}>
+                  {liste.map((c) => <span key={c.id} className="puce">{c.libelle}</span>)}
+                </div>
+              </div>
             ) : (
               <div className="table-wrap">
                 <table>

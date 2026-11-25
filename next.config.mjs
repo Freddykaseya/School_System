@@ -7,6 +7,8 @@ const nextConfig = {
   // exceljs (lecture des fichiers en comptabilité) sont chargés tels quels
   // par Node.js, sans passer par le bundler.
   serverExternalPackages: ['@electric-sql/pglite', 'pg', 'pdfjs-dist', 'exceljs'],
+  // Pas de bouton d'outils de développement par-dessus l'interface.
+  devIndicators: false,
   experimental: {
     // Comptabilité : tous les PDF et l'Excel d'une école en un seul envoi.
     proxyClientMaxBodySize: '50mb',

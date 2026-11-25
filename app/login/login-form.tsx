@@ -15,7 +15,7 @@ export function LoginForm({ messageInitial }: { messageInitial: string | null })
 
   return (
     <form action={action} className="login-card">
-      <div className="brand" style={{ padding: 0 }}>
+      <div className="brand">
         <Logo taille={40} />
         <div>
           <strong>{MARQUE.complet}</strong>
@@ -23,8 +23,8 @@ export function LoginForm({ messageInitial }: { messageInitial: string | null })
         </div>
       </div>
       <div>
-        <h1 style={{ fontSize: 20 }}>Connexion</h1>
-        <p className="sub">Vous arriverez directement dans votre école.</p>
+        <h1>Connexion</h1>
+        <p className="sub">Connectez-vous, puis choisissez votre école.</p>
       </div>
       {erreur ? <div className="error" role="alert">{erreur}</div> : null}
       <label className="field">
