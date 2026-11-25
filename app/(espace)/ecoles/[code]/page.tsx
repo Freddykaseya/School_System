@@ -1,4 +1,4 @@
-import { ArrowLeft, Calculator, LayoutDashboard, School, Users } from 'lucide-react'
+import { ArrowLeft, Calculator, LayoutDashboard, ReceiptText, School, Users } from 'lucide-react'
 import Link from 'next/link'
 
 import { ecoleAccessible, peutFaireComptabilite } from '@/lib/acces'
@@ -14,6 +14,10 @@ export default async function AccueilEcole({ params }: { params: Promise<{ code:
     {
       href: `/ecoles/${ecole.code}/tableau-de-bord`, Icone: LayoutDashboard, titre: 'Tableau de bord',
       texte: 'Effectifs et paiements par classe, taux de recouvrement.',
+    },
+    {
+      href: `/ecoles/${ecole.code}/frais`, Icone: ReceiptText, titre: 'Frais scolaires',
+      texte: admin ? 'Fixer le minerval, les tranches, le bulletin et les autres frais de chaque classe.' : 'Minerval, tranches, bulletin et autres frais de chaque classe.',
     },
     {
       href: `/ecoles/${ecole.code}/comptabilite`, Icone: Calculator, titre: 'Comptabilité',

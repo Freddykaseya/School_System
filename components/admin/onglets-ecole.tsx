@@ -1,12 +1,13 @@
 import Link from 'next/link'
 
-export type OngletEcole = 'accueil' | 'tableau' | 'comptabilite' | 'personnel'
+export type OngletEcole = 'accueil' | 'tableau' | 'frais' | 'comptabilite' | 'personnel'
 
 /** Navigation à l'intérieur d'une école. « Personnel » : administrateur seulement. */
 export function OngletsEcole({ code, actif, admin = false }: { code: string; actif: OngletEcole; admin?: boolean }) {
   const onglets: { cle: OngletEcole; libelle: string; href: string }[] = [
     { cle: 'accueil', libelle: 'Accueil', href: `/ecoles/${code}` },
     { cle: 'tableau', libelle: 'Tableau de bord', href: `/ecoles/${code}/tableau-de-bord` },
+    { cle: 'frais', libelle: 'Frais scolaires', href: `/ecoles/${code}/frais` },
     { cle: 'comptabilite', libelle: 'Comptabilité', href: `/ecoles/${code}/comptabilite` },
     ...(admin ? [{ cle: 'personnel' as const, libelle: 'Personnel', href: `/admin/comptes/ecole/${code}` }] : []),
   ]
